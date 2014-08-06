@@ -61,7 +61,9 @@ namespace mdx {
     }
 
     //
-    std::shared_ptr<Mesh> AssimpInterpretor::interpret_mesh(std::string name_prefix, const aiMesh *assimp_mesh, const Matrix4x4 &transform) {
+    std::shared_ptr<Mesh> AssimpInterpretor::interpret_mesh(std::string name_prefix,
+                                                            const aiMesh *assimp_mesh,
+                                                            const Matrix4x4 &transform) {
         // establish the group name
         std::string mesh_name = assimp_mesh->mName.C_Str();
         std::string group_name = !mesh_name.empty() ? name_prefix + "_" + mesh_name : name_prefix;
@@ -135,11 +137,14 @@ namespace mdx {
     }
 
     //
-    void AssimpInterpretor::interpret_bone(const aiNode *assimp_bone, const Matrix4x4 &parent_transform, std::shared_ptr<Skeleton::Bone> parent_bone) {
+    void AssimpInterpretor::interpret_bone(const aiNode *assimp_bone,
+                                           const Matrix4x4 &parent_transform,
+                                           std::shared_ptr<Skeleton::Bone> parent_bone) {
         std::string bone_name = assimp_bone->mName.C_Str();
         Matrix4x4 assimp_local_transform(assimp_bone->mTransformation);
         Matrix4x4 global_transform(parent_transform * assimp_local_transform);
-        Matrix4x4 inverse_parent_global = parent_bone != nullptr ? parent_bone->get_global_transform().get_inverse() : Matrix4x4(1.0f);
+        Matrix4x4 inverse_parent_global = parent_bone != nullptr ?
+                parent_bone->get_global_transform().get_inverse() : Matrix4x4(1.0f);
         Matrix4x4 local_transform = inverse_parent_global * global_transform;
 
         // create and add the bone
@@ -201,7 +206,10 @@ namespace mdx {
                         aiQuatKey rotation_key = anim_node->mRotationKeys[k];
                         float time = rotation_key.mTime;
                         aiQuaternion assimp_orientation = rotation_key.mValue;
-                        glm::quat orientation = glm::quat(assimp_orientation.w, glm::vec3(assimp_orientation.x, assimp_orientation.y, assimp_orientation.z));
+                        glm::quat orientation = glm::quat(assimp_orientation.w,
+                                                          glm::vec3(assimp_orientation.x,
+                                                                    assimp_orientation.y,
+                                                                    assimp_orientation.z));
                         // add key to animation
                         animation->add_orientation(time, bone, orientation);
                     }
@@ -223,7 +231,9 @@ namespace mdx {
     Matrix4x4 AssimpInterpretor::get_pose_transform(const std::vector<Vertex::BoneWeight> &bone_weights) {
         Matrix4x4 mesh_to_pose(0.0f);
         for (auto &bone_weight : bone_weights) {
-            mesh_to_pose += bone_weight.bone->get_global_transform() * bone_weight.bone->get_inverse_bind_pose() * bone_weight.weight;
+            mesh_to_pose += bone_weight.bone->get_global_transform() *
+                    bone_weight.bone->get_inverse_bind_pose() *
+                    bone_weight.weight;
         }
         return mesh_to_pose;
     }
